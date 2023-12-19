@@ -2,32 +2,46 @@ import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import requestService from './lib/get'
+import { getCustomers ,getRepairers } from './api/users';
 
 function App() {
   const [count, setCount] = useState(0)
   const [repairers, setRepairers] = useState([]);
   const [customers, setCustomers] = useState([]);
 
+  // useEffect(() => {
+  //   fetch('http://localhost:16001/repairers')
+  //     .then((res) => {
+  //       return res.json();
+  //     })
+  //     .then((data) => {
+  //       console.log(data);
+  //       setRepairers(data);
+  //     });
+  // }, []);
+
+  // useEffect(() => {
+  //   fetch('http://localhost:16001/customers')
+  //     .then((res) => {
+  //       return res.json();
+  //     })
+  //     .then((data) => {
+  //       console.log(data);
+  //       setCustomers(data);
+  //     });
+  // }, []);
+
   useEffect(() => {
-    fetch('http://localhost:16001/repairers')
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        console.log(data);
-        setRepairers(data);
-      });
+    getRepairers().then(data => setRepairers(data)).catch(e => console.error(e));
+
+    // setCustomers(data);
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:16001/customers')
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        console.log(data);
-        setCustomers(data);
-      });
+    getCustomers().then(data => setCustomers(data)).catch(e => console.error(e));
+
+    // setCustomers(data);
   }, []);
 
   return (
