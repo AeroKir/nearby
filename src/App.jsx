@@ -1,14 +1,25 @@
 import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-import requestService from './lib/get'
-import { getCustomers ,getRepairers } from './api/users';
+import Select from './components/select/Select'
+import requestService from './lib/http-service'
+import { getCustomers, getRepairers } from './api/users';
+import { getCountries, getCitiesInTheCountry } from './api/locations';
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [repairers, setRepairers] = useState([]);
-  const [customers, setCustomers] = useState([]);
+    const [repairers, setRepairers] = useState([]);
+    const [customers, setCustomers] = useState([]);
+
+    const [countries, setCountries] = useState([]);
+    const [selectedCountry, setSelectedCountry] = useState(null);
+    const [cities, setCities] = useState([]);
+
+  useEffect(() => {
+    getCountries()
+        .then(countries => {
+            setCountries(countries);
+        })
+        .catch(e => console.log(e));
+}, []);
 
   // useEffect(() => {
   //   fetch('http://localhost:16001/repairers')
@@ -32,65 +43,90 @@ function App() {
   //     });
   // }, []);
 
-  useEffect(() => {
-    getRepairers().then(data => setRepairers(data)).catch(e => console.error(e));
+//   useEffect(() => {
+//     getRepairers().then(data => setRepairers(data)).catch(e => console.error(e));
 
-    // setCustomers(data);
-  }, []);
+//     // setCustomers(data);
+//   }, []);
 
-  useEffect(() => {
-    getCustomers().then(data => setCustomers(data)).catch(e => console.error(e));
+//   useEffect(() => {
+//     getCustomers().then(data => setCustomers(data)).catch(e => console.error(e));
 
-    // setCustomers(data);
-  }, []);
+//     // setCustomers(data);
+//   }, []);
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    async function handleCountrySelect(country) {
+        setSelectedCountry(country);
+        console.log(selectedCountry);
 
-      <div>
+        await getCitiesInTheCountry(`countryId=${selectedCountry.country_id}`)
+            .then(cities => {
+                setCities(cities);
+            })
+            .catch(e => console.log(e));
+    }
 
-      <h1>This is repairs</h1>
-      {repairers.map((repairer) => (
-        <>
-          <ul key={repairer.id}>
-            <li>{repairer.name}</li>
-          </ul>
-        </>
+    // async function getCities(params) {
+    //     await getCitiesInTheCountry(`countryId=${selectedCountry.country_id}`)
+    //         .then(cities => {
+    //             setCities(cities);
+    //             return cities;
+    //         })
+    //         .catch(e => console.log(e));
+    // }
 
-      ))}
+    return (
+        <div>
+            <Select
+                // isAsync
+                // loadOptions={countries}
+                optionsList={countries}
+                optionKey={'country_name'}
+                selectAriaLabel="Select country"
+                onChange={handleCountrySelect}
+            />
+            {/* <div className="mb-4">
+                {countries.map(country => (
+                    <ul key={country.country_id}>
+                        <li>{country.country_name}</li>
+                    </ul>
+                ))}
+            </div> */}
 
-      <h1>This is customers from another microservice</h1>
-      {customers.map((customer) => (
-        <>
-          <ul key={customer.id}>
-            <li>{customer.name}</li>
-          </ul>
-        </>
+            <div className="mb-4 mt-10">
+                <Select
+                    isAsync
+                    loadOptions={cities}
+                    // optionsList={cities}
+                    optionKey={'city_name'}
+                    selectAriaLabel="Select city"
+                />
+            </div>
 
-      ))}
-    </div>
-    </>
-  )
+            {/* <div>{selectedCountry}</div> */}
+
+
+                {/* <h1>This is repairs</h1>
+                {repairers.map((repairer) => (
+                    <>
+                    <ul key={repairer.id}>
+                        <li>{repairer.name}</li>
+                    </ul>
+                    </>
+
+                ))}
+
+                <h1>This is customers from another microservice</h1>
+                {customers.map((customer) => (
+                    <>
+                    <ul key={customer.id}>
+                        <li>{customer.name}</li>
+                    </ul>
+                    </>
+
+                ))} */}
+        </div>
+    )
 }
 
 export default App

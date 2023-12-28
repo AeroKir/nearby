@@ -1,6 +1,5 @@
 import { API_GATEWAY_URL } from '../constants/api';
-import requestService from '../lib/get';
-import { HttpService } from '../lib/get';
+import HttpService from '../lib/http-service';
 
 const service = new HttpService();
 

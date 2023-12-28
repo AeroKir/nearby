@@ -12,6 +12,8 @@ function Select({
     selectAriaLabel,
     onChange,
     optionKey,
+    isAsync,
+    loadOptions,
  }) {
     const selectRef = useRef();
     const [isOptionsOpen, setIsOptionsOpen] = useState(false);
@@ -74,6 +76,13 @@ function Select({
         }
     }
 
+    function getOptionsList() {
+        if (isAsync) {
+            return loadOptions;
+        }
+        return optionsList;
+    }
+
     return (
         <div
             ref={selectRef}
@@ -87,6 +96,7 @@ function Select({
                 inputValue={typeof optionsList[selectedOption] === 'object' ? optionsList[selectedOption][optionKey] : optionsList[selectedOption]}
                 onFocus={expandOptions}
                 isReadOnly
+                placeholder={'Loading'}
                 endAdornment={
                     <Button
                         ariaLabel={!isOptionsOpen ? 'Show options list' : 'Hide options list'}
@@ -106,7 +116,23 @@ function Select({
                 tabIndex={-1}
                 className={isOptionsOpen ? optionsListClasses : 'hidden'}
             >
-                {optionsList.map((option, index) => (
+                {/* {isAsync ? '' :
+                    getOptionsList().map((option, index) => (
+                        <li
+                            key={generateKey()}
+                            role="option"
+                            aria-selected={selectedOption === index}
+                            tabIndex={0}
+                            className="text-white cursor-pointer transition-all hover:text-sky-300 focus:text-sky-300 active:text-sky-300 aria-selected:text-sky-300"
+                            onClick={() => setSelectedThenCloseDropdown(index)}
+                            onKeyDown={handleKeyboardSelect(index)}
+                            value={typeof option === 'object' ? option[optionKey] : option}
+                        >
+                            { typeof option === 'object' ? option[optionKey] : option }
+                        </li>
+                    ))
+                } */}
+                {getOptionsList().map((option, index) => (
                     <li
                         key={generateKey()}
                         role="option"
@@ -133,6 +159,9 @@ Select.propTypes = {
         PropTypes.string,
         PropTypes.number
     ]),
+    isAsync: PropTypes.bool,
+    // loadOptions: PropTypes.func,
+    // loadOptions: PropTypes.array,
 };
 
 Select.defaultProps = {
@@ -140,6 +169,9 @@ Select.defaultProps = {
     selectAriaLabel: 'Select',
     onChange: () => {},
     optionKey: '',
+    isAsync: false,
+    // loadOptions: [],
+    // loadOptions: async () => { return [] }
 };
 
 export default Select;
